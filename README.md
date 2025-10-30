@@ -1,0 +1,2 @@
+- In /server: npm run start
+- npx @mcpjam/inspector@latest
