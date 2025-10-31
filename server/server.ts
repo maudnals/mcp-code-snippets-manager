@@ -139,9 +139,12 @@ server.registerResource(
 );
 
 // Load locally built assets (produced by your component build)
-const KANBAN_JS = readFileSync("../web-app/dist/assets/index.js", "utf8");
+const TEST_COMPONENT_JS = readFileSync(
+  "../web-app/dist/assets/index.js",
+  "utf8"
+);
 
-const KANBAN_CSS = (() => {
+const TEST_COMPONENT_CSS = (() => {
   try {
     return readFileSync("../web-app/dist/assets/index.css", "utf8");
   } catch {
@@ -149,18 +152,18 @@ const KANBAN_CSS = (() => {
   }
 })();
 
-// const KANBAN_HTML = fs.readFileSync("../web-app/dist/index.html", "utf8");
 // Replaced this with inline HTML
+// const TEST_COMPONENT_HTML = fs.readFileSync("../web-app/dist/index.html", "utf8");
 
 // UI resource (no inline data assignment; host will inject data)
 server.registerResource(
-  "kanban-widget",
-  "ui://widget/kanban-board.html",
+  "test-component-widget",
+  "ui://widget/test-component.html",
   {},
   async () => ({
     contents: [
       {
-        uri: "ui://widget/kanban-board.html",
+        uri: "ui://widget/test-component.html",
         mimeType: "text/html+skybridge",
         text: `<!DOCTYPE html>
         <html lang="en">
@@ -168,19 +171,13 @@ server.registerResource(
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>web-app</title>
-            <script type="module">${KANBAN_JS}</script>
-            <style>${KANBAN_CSS}</style>
+            <script type="module">${TEST_COMPONENT_JS}</script>
+            <style>${TEST_COMPONENT_CSS}</style>
           </head>
           <body>
             <div id="root"></div>
           </body>
         </html>`,
-
-        //         text: `
-        // <div id="kanban-root"></div><h1>Hello world</h1>
-        // ${KANBAN_CSS ? `<style>${KANBAN_CSS}</style>` : ""}
-        // <script type="module">${KANBAN_JS}</script>
-        //         `.trim(),
         _meta: {
           /* 
             Renders the widget within a rounded border and shadow. 
@@ -212,21 +209,21 @@ server.registerResource(
 );
 
 server.registerTool(
-  "kanban-board",
+  "test-component",
   {
-    title: "Show Kanban Board",
+    title: "Show test component",
     _meta: {
       // associate this tool with the HTML template
-      "openai/outputTemplate": "ui://widget/kanban-board.html",
+      "openai/outputTemplate": "ui://widget/test-component.html",
       // labels to display in ChatGPT when the tool is called
-      "openai/toolInvocation/invoking": "Displaying the board",
-      "openai/toolInvocation/invoked": "Displayed the board",
+      "openai/toolInvocation/invoking": "Displaying the test component",
+      "openai/toolInvocation/invoked": "Displayed the test component",
     },
-    inputSchema: { tasks: z.string() },
+    inputSchema: { userInput: z.string() },
   },
   async () => {
     return {
-      content: [{ type: "text", text: "Displayed the kanban board!" }],
+      content: [{ type: "text", text: "Displayed the test component!" }],
       structuredContent: {},
     };
   }
