@@ -1,2 +1,3 @@
 - In /server: npm run start
+- In /web app: npm run watch
 - npx @mcpjam/inspector@latest
