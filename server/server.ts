@@ -140,19 +140,19 @@ server.registerResource(
 
 // Load locally built assets (produced by your component build)
 const KANBAN_JS = readFileSync(
-  "../my-app-ts/dist/assets/index-DDMyXTNR.js",
+  "../web-app/dist/assets/index-DDMyXTNR.js",
   "utf8"
 );
 
 const KANBAN_CSS = (() => {
   try {
-    return readFileSync("../my-app-ts/dist/assets/index-BMeT29y7.css", "utf8");
+    return readFileSync("../web-app/dist/assets/index-BMeT29y7.css", "utf8");
   } catch {
     return ""; // CSS optional
   }
 })();
 
-// const KANBAN_HTML = fs.readFileSync("../my-app-ts/dist/index.html", "utf8");
+// const KANBAN_HTML = fs.readFileSync("../web-app/dist/index.html", "utf8");
 // Replaced this with inline HTML
 
 // UI resource (no inline data assignment; host will inject data)
@@ -170,7 +170,7 @@ server.registerResource(
           <head>
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>my-app-ts</title>
+            <title>web-app</title>
             <script type="module">${KANBAN_JS}</script>
             <style>${KANBAN_CSS}</style>
           </head>
