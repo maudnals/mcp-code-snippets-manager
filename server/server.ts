@@ -139,14 +139,11 @@ server.registerResource(
 );
 
 // Load locally built assets (produced by your component build)
-const KANBAN_JS = readFileSync(
-  "../web-app/dist/assets/index-DDMyXTNR.js",
-  "utf8"
-);
+const KANBAN_JS = readFileSync("../web-app/dist/assets/index.js", "utf8");
 
 const KANBAN_CSS = (() => {
   try {
-    return readFileSync("../web-app/dist/assets/index-BMeT29y7.css", "utf8");
+    return readFileSync("../web-app/dist/assets/index.css", "utf8");
   } catch {
     return ""; // CSS optional
   }
