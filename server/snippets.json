@@ -12,7 +12,14 @@
       "userId": "user123",
       "title": "Sticky header",
       "language": "css",
-      "code": "position: sticky; top: 0;"
+      "code": "{ position: sticky; top: 0; }"
+    },
+    {
+      "id": "uuid3",
+      "userId": "user456",
+      "title": "Array filter",
+      "language": "js",
+      "code": "const result = words.filter((word) => word.length > 6);"
     }
   ]
 }
