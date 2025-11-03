@@ -202,6 +202,8 @@ server.registerResource(
             // Maps to style-src, style-src-elem, img-src, font-src, media-src etc. in the iframe CSP
             resource_domains: ["https://*.oaistatic.com"],
           },
+          // Allow the test-component tool to call tools
+          "openai/widgetAccessible": true,
         },
       },
     ],
