@@ -3,10 +3,20 @@ import {
   ResourceTemplate,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import {
+  getSnippetsByUserId,
+  createSnippet,
+  updateSnippet,
+  deleteSnippet,
+} from "./storage";
 import express from "express";
 import fs from "node:fs";
 import { readFileSync } from "node:fs";
 import { z } from "zod";
+
+// Dummy userId for now
+// TODO replace with actual user ID from auth
+const DUMMY_USER_ID = "user123";
 
 const server = new McpServer({
   name: "demo-server",
@@ -83,6 +93,165 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "create_snippet",
+  {
+    title: "Create Code Snippet",
+    description: "Saves a new code snippet.",
+    inputSchema: {
+      title: z.string().describe("The title of the snippet."),
+      language: z.string().describe("The programming language."),
+      code: z.string().describe("The code content."),
+    },
+  },
+  async ({ title, language, code }) => {
+    try {
+      const newSnippet = await createSnippet(
+        DUMMY_USER_ID,
+        title,
+        language,
+        code
+      );
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Snippet "${newSnippet.title}" created with ID: ${newSnippet.id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error creating snippet: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "get_snippets",
+  {
+    title: "Get Code Snippets",
+    description: "Retrieves all code snippets for the user.",
+    inputSchema: {}, // No input needed
+  },
+  async () => {
+    try {
+      const snippets = await getSnippetsByUserId(DUMMY_USER_ID);
+      return {
+        content: [{ type: "text", text: JSON.stringify(snippets) }],
+        structuredContent: { snippetsAsArr: snippets },
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error getting snippets: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "update_snippet",
+  {
+    title: "Update Code Snippet",
+    description: "Updates an existing code snippet.",
+    inputSchema: {
+      id: z.string().describe("The ID of the snippet to update."),
+      title: z.string().describe("The new title."),
+      language: z.string().describe("The new language."),
+      code: z.string().describe("The new code content."),
+    },
+  },
+  async ({ id, title, language, code }) => {
+    try {
+      const updatedSnippet = await updateSnippet(
+        DUMMY_USER_ID,
+        id,
+        title,
+        language,
+        code
+      );
+      if (updatedSnippet) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Snippet "${updatedSnippet.title}" (ID: ${id}) updated.`,
+            },
+          ],
+        };
+      } else {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Snippet with ID: ${id} not found or access denied.`,
+            },
+          ],
+        };
+      }
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error updating snippet: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "delete_snippet",
+  {
+    title: "Delete Code Snippet",
+    description: "Deletes a code snippet.",
+    inputSchema: {
+      id: z.string().describe("The ID of the snippet to delete."),
+    },
+  },
+  async ({ id }) => {
+    try {
+      const deleted = await deleteSnippet(DUMMY_USER_ID, id);
+      if (deleted) {
+        return {
+          content: [{ type: "text", text: `Snippet with ID: ${id} deleted.` }],
+        };
+      } else {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Snippet with ID: ${id} not found or access denied.`,
+            },
+          ],
+        };
+      }
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error deleting snippet: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
 // Dynamic resource with parameters
 server.registerResource(
   "greeting",
@@ -138,12 +307,11 @@ server.registerResource(
   })
 );
 
-// Load locally built assets (produced by your component build)
+// Load locally built assets
 const TEST_COMPONENT_JS = readFileSync(
   "../web-app/dist/assets/index.js",
   "utf8"
 );
-
 const TEST_COMPONENT_CSS = (() => {
   try {
     return readFileSync("../web-app/dist/assets/index.css", "utf8");
